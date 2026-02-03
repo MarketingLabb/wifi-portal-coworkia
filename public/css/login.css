@@ -1,0 +1,350 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f9fafb;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  max-width: 900px;
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Coworkia */
+.header-section {
+  background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.brand-name {
+  color: white;
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  margin-bottom: 8px;
+}
+
+.brand-subtitle {
+  color: rgba(255,255,255,0.95);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+/* Contenido Principal */
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+/* Sección de Publicidad */
+.ad-section {
+  background: linear-gradient(135deg, rgba(78,205,196,0.1), rgba(68,160,141,0.1));
+  padding: 40px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-right: 1px solid rgba(78,205,196,0.2);
+}
+
+.ad-content img {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 0 0 15px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.ad-footer-text {
+  color: #6B7280;
+  font-size: 13px;
+  text-align: center;
+  margin: 10px 0 0 0;
+  font-weight: 500;
+}
+
+.ad-link {
+  display: inline-block;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #4ECDC4, #44A08D);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(78,205,196,0.3);
+  transition: all 0.3s ease;
+}
+
+.ad-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(78,205,196,0.4);
+}
+
+/* Sección de Login */
+.login-section {
+  padding: 40px 35px;
+}
+
+.welcome-text {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.welcome-text h2 {
+  color: #374151;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.welcome-text p {
+  color: #6B7280;
+  font-size: 15px;
+}
+
+/* Info Box */
+.info-box {
+  background: linear-gradient(135deg, rgba(78,205,196,0.1), rgba(68,160,141,0.1));
+  border-left: 4px solid #4ECDC4;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  color: #374151;
+  font-weight: 500;
+}
+
+.info-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  color: #4ECDC4;
+}
+
+/* Formulario */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s;
+  color: #374151;
+  background: white;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4ECDC4;
+  box-shadow: 0 0 0 3px rgba(78,205,196,0.1);
+}
+
+.form-group input[type="text"]#code {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 6px;
+  color: #9CA3AF;
+  font-size: 12px;
+}
+
+/* Botón Principal */
+button[type="submit"] {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #4ECDC4, #44A08D);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(78,205,196,0.3);
+  transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(78,205,196,0.4);
+}
+
+button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Mensajes */
+.message {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  display: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.message.show {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.success {
+  background: linear-gradient(135deg, rgba(78,205,196,0.1), rgba(68,160,141,0.1));
+  color: #44A08D;
+  border: 2px solid #4ECDC4;
+}
+
+.message.error {
+  background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.1));
+  color: #D97706;
+  border: 2px solid #F59E0B;
+}
+
+/* Sección de Ayuda */
+.help-section {
+  margin-top: 30px;
+  text-align: center;
+  padding: 20px;
+  background: rgba(78,205,196,0.05);
+  border-radius: 12px;
+}
+
+.help-section p {
+  color: #6B7280;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.whatsapp-button {
+  display: inline-block;
+  padding: 10px 25px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(37,211,102,0.3);
+  transition: all 0.3s ease;
+}
+
+.whatsapp-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37,211,102,0.4);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 30px 20px;
+  background: #374151;
+  color: #9CA3AF;
+}
+
+.footer-brand {
+  color: #4ECDC4;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.footer-tagline {
+  color: #9CA3AF;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+
+.footer-info {
+  color: #6B7280;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .brand-name {
+    font-size: 48px;
+  }
+  
+  .brand-subtitle {
+    font-size: 16px;
+  }
+  
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .ad-section {
+    border-right: none;
+    border-bottom: 1px solid rgba(78,205,196,0.2);
+    padding: 30px 20px;
+  }
+  
+  .login-section {
+    padding: 30px 25px;
+  }
+  
+  .form-group input[type="text"]#code {
+    font-size: 16px;
+  }
+}

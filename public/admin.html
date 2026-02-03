@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Sistema WiFi Coworkia</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="dashboard">
+    <header>
+      <h1>🎛️ Panel de Administración - Coworkia WiFi</h1>
+      <div class="header-actions">
+        <span id="currentTime"></span>
+      </div>
+    </header>
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Códigos</h3>
+        <p class="stat-number" id="totalCodes">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Disponibles</h3>
+        <p class="stat-number" id="availableCodes">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>En Uso</h3>
+        <p class="stat-number" id="usedCodes">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Sesiones Activas</h3>
+        <p class="stat-number" id="activeSessions">0</p>
+      </div>
+    </div>
+
+    <!-- Generador de Códigos -->
+    <div class="section">
+      <h2>Generar Códigos Nuevos</h2>
+      <div class="generator-form">
+        <label for="quantity">Cantidad de códigos:</label>
+        <input type="number" id="quantity" value="10" min="1" max="100">
+        <button onclick="generateCodes()" class="btn-primary">Generar Códigos</button>
+      </div>
+      <div id="generateMessage" class="message"></div>
+    </div>
+
+    <!-- Lista de Códigos -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Códigos Generados</h2>
+        <div class="filters">
+          <select id="statusFilter" onchange="loadCodes()">
+            <option value="">Todos</option>
+            <option value="disponible">Disponibles</option>
+            <option value="usado">Usados</option>
+            <option value="expirado">Expirados</option>
+          </select>
+          <button onclick="loadCodes()" class="btn-secondary">🔄 Actualizar</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="codesTable">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Creado</th>
+              <th>Usado</th>
+              <th>Cliente</th>
+              <th>Expira</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="codesTableBody">
+            <tr>
+              <td colspan="7" style="text-align: center;">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Botón para imprimir códigos disponibles -->
+    <div class="section">
+      <button onclick="printAvailableCodes()" class="btn-secondary">🖨️ Imprimir Códigos Disponibles</button>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

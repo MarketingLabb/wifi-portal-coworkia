@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WiFi Coworkia - Portal de Acceso</title>
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header Coworkia -->
+    <div class="header-section">
+      <div class="brand">
+        <div class="brand-name">Coworkia</div>
+        <div class="brand-subtitle">BUSINESS CENTER</div>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+      <!-- Sección de Publicidad -->
+      <div class="ad-section" id="adSection">
+        <div class="ad-content">
+          <img id="adImage" src="" alt="Publicidad" style="display:none;">
+          <p class="ad-footer-text">¿quieres tu publicidad aquí 👆🏽?</p>
+          <a id="adLink" href="#" target="_blank" class="ad-link" style="display:none;">Ver más</a>
+        </div>
+      </div>
+
+      <!-- Formulario de Acceso -->
+      <div class="login-section">
+        <div class="welcome-text">
+          <h2>Conéctate al WiFi 📶</h2>
+          <p>Tu espacio de trabajo te está esperando</p>
+        </div>
+
+        <div class="info-box">
+          <div class="info-item">
+            <span class="info-icon">⏰</span>
+            <span>2 horas de navegación</span>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">⚡</span>
+            <span>Alta velocidad</span>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">🔒</span>
+            <span>Conexión segura</span>
+          </div>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="code">Código de Acceso</label>
+            <input 
+              type="text" 
+              id="code" 
+              name="code" 
+              placeholder="XXXX-XXXX" 
+              maxlength="9"
+              pattern="[A-Z0-9]{4}-[A-Z0-9]{4}"
+              required
+              autocomplete="off"
+            >
+            <small>Ingresa el código proporcionado por Aurora</small>
+          </div>
+
+          <div class="form-group">
+            <label for="clientName">Tu Nombre (opcional)</label>
+            <input 
+              type="text" 
+              id="clientName" 
+              name="clientName" 
+              placeholder="Ej: María López"
+            >
+          </div>
+
+          <button type="submit" id="submitBtn">
+            <span id="btnText">📡 WiFi ahora!</span>
+            <span id="btnLoader" style="display:none;">⏳ Conectando...</span>
+          </button>
+        </form>
+
+        <div id="message" class="message"></div>
+
+        <div class="help-section">
+          <p>💬 ¿Te quedaste sin internet?</p>
+          <a href="https://wa.me/593994837117?text=%C2%A1auxilio%20Aurora%2C%20me%20quede%20sin%20internet%21" 
+             target="_blank" 
+             class="whatsapp-button">
+            📱 Habla con Aurora
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-brand">Coworkia</div>
+      <div class="footer-tagline">work · connect · grow</div>
+      <div class="footer-info">El sistema IA de Coworkia está creado por MarketingLab / OneMind</div>
+    </div>
+  </div>
+
+  <script src="/js/login.js"></script>
+</body>
+</html>
