@@ -37,97 +37,14 @@ app.use(async (req, res, next) => {
       if (session) {
         console.log(`✅ Cliente autenticado: MAC=${mac}, expira en ${session.expires_at}`);
         
-        // Cliente autenticado - responder con HTML simple inline
+        // Cliente autenticado - cerrar portal automáticamente
         if (req.path === '/hotspot-detect.html' || 
-            req.path === '/library/test/success.html' ||
-            req.path === '/generate_204' ||
-            req.path === '/gen_204') {
-          
-          const expiresAt = new Date(session.expires_at);
-          const now = new Date();
-          const diffMs = expiresAt - now;
-          const hours = Math.floor(diffMs / (1000 * 60 * 60));
-          const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-          
-          return res.send(`<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conectado - Coworkia WiFi</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
-    }
-    .logo {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 20px;
-      background: #0d9488;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      color: white;
-    }
-    h1 { color: #1f2937; font-size: 28px; margin-bottom: 10px; }
-    .status { color: #22c55e; font-size: 18px; font-weight: 600; margin-bottom: 30px; }
-    .info-box { background: #f3f4f6; border-radius: 15px; padding: 25px; margin-bottom: 20px; }
-    .timer { font-size: 48px; font-weight: bold; color: #0d9488; margin-bottom: 10px; }
-    .timer-label { color: #6b7280; font-size: 14px; margin-bottom: 20px; }
-    .disconnect-time { color: #374151; font-size: 16px; line-height: 1.6; }
-    .disconnect-time strong { color: #1f2937; }
-    .footer { margin-top: 20px; color: #9ca3af; font-size: 14px; }
-    .close-btn {
-      margin-top: 20px;
-      background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      text-decoration: none;
-      display: block;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="logo">✓</div>
-    <h1>¡Ya estás conectado!</h1>
-    <p class="status">Navegación activa</p>
-    <div class="info-box">
-      <div class="timer">${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}</div>
-      <div class="timer-label">Tiempo restante aproximado</div>
-      <div class="disconnect-time">
-        <strong>Tu sesión finalizará:</strong><br>
-        ${expiresAt.toLocaleString('es-MX', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-      </div>
-    </div>
-    <div class="footer">Disfruta tu navegación en Coworkia WiFi</div>
-    <a href="done" class="close-btn">Cerrar</a>
-  </div>
-</body>
-</html>`);
+            req.path === '/library/test/success.html') {
+          return res.status(200).send('<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>');
+        }
+        
+        if (req.path === '/generate_204' || req.path === '/gen_204') {
+          return res.status(204).send();
         }
         
         if (req.path === '/connecttest.txt' || req.path === '/ncsi.txt') {
