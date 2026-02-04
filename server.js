@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { initialize } = require('./database/db');
+const { initialize, db } = require('./database/db');
 const codeRoutes = require('./routes/codes');
 const authRoutes = require('./routes/auth');
+const { getClientInfo } = require('./utils/macHelper');
 
 const app = express();
 const PORT = process.env.PORT || 80;
@@ -13,6 +14,45 @@ const HOST = '0.0.0.0'; // Escuchar en todas las interfaces
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Middleware para verificar si el cliente ya está autenticado
+app.use(async (req, res, next) => {
+  try {
+    // Obtener MAC del cliente
+    const { mac } = await getClientInfo(req);
+    
+    if (mac) {
+      // Verificar si tiene sesión activa
+      const session = db().prepare(`
+        SELECT * FROM sessions 
+        WHERE mac_address = ? 
+        AND disconnected_at IS NULL 
+        AND datetime(expires_at) > datetime('now')
+        ORDER BY started_at DESC 
+        LIMIT 1
+      `).get(mac);
+      
+      if (session) {
+        // Cliente autenticado - permitir peticiones especiales de detección
+        if (req.path === '/hotspot-detect.html' || 
+            req.path === '/library/test/success.html' ||
+            req.path === '/generate_204' ||
+            req.path === '/gen_204') {
+          return res.status(204).send(); // Respuesta exitosa sin contenido
+        }
+        
+        if (req.path === '/connecttest.txt' || req.path === '/ncsi.txt') {
+          return res.send('Microsoft Connect Test');
+        }
+      }
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Error verificando autenticación:', error);
+    next();
+  }
+});
 
 // Log todas las peticiones
 app.use((req, res, next) => {
