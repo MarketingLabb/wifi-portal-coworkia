@@ -2,11 +2,17 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../database/db');
 const { validateFormat } = require('../utils/codeGenerator');
+const { getClientInfo } = require('../utils/macHelper');
+const { allowMAC } = require('../utils/firewallManager');
 
 // Validar código y crear sesión
-router.post('/validate', (req, res) => {
+router.post('/validate', async (req, res) => {
   try {
     const { code, clientName, deviceInfo } = req.body;
+    
+    // Obtener IP y MAC del cliente
+    const { ip, mac } = await getClientInfo(req);
+    console.log(`🔍 Cliente conectando: IP=${ip}, MAC=${mac}`);
     
     // Validar formato
     if (!validateFormat(code)) {
@@ -59,17 +65,34 @@ router.post('/validate', (req, res) => {
     const session = db.prepare(`
       INSERT INTO sessions (code, ip_address, mac_address, expires_at)
       VALUES (?, ?, ?, ?)
-    `).run(code, req.ip || '0.0.0.0', req.headers['x-mac-address'] || null, expiresAt.toISOString());
+    `).run(code, ip, mac, expiresAt.toISOString());
+    
+    console.log(`✅ Sesión creada: Código=${code}, IP=${ip}, MAC=${mac}`);
+    
+    // Desbloquear acceso a internet para esta MAC
+    if (mac) {
+      const unlocked = await allowMAC(mac);
+      if (unlocked) {
+        console.log(`🔓 Internet desbloqueado para MAC ${mac}`);
+      } else {
+        console.warn(`⚠️  No se pudo desbloquear MAC ${mac}, pero sesión creada`);
+      }
+    } else {
+      console.warn('⚠️  No se pudo obtener MAC address del cliente');
+    }
     
     res.json({ 
       success: true, 
       message: 'Acceso concedido',
       expiresAt: expiresAt.toISOString(),
       sessionId: session.lastInsertRowid,
-      duration: '2 horas'
+      duration: '2 horas',
+      clientIP: ip,
+      clientMAC: mac
     });
     
   } catch (error) {
+    console.error('❌ Error en validación:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
