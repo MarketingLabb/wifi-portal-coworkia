@@ -19,7 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(async (req, res, next) => {
   try {
     // Obtener MAC del cliente
-    const { mac } = await getClientInfo(req);
+    const { ip, mac } = await getClientInfo(req);
+    
+    console.log(`🔍 Cliente conectando: IP=${ip}, MAC=${mac || 'desconocida'}`);
     
     if (mac) {
       // Verificar si tiene sesión activa
@@ -33,17 +35,26 @@ app.use(async (req, res, next) => {
       `).get(mac);
       
       if (session) {
-        // Cliente autenticado - permitir peticiones especiales de detección
+        console.log(`✅ Cliente autenticado: MAC=${mac}, expira en ${session.expires_at}`);
+        
+        // Cliente autenticado - responder correctamente a detección de portal
         if (req.path === '/hotspot-detect.html' || 
             req.path === '/library/test/success.html' ||
             req.path === '/generate_204' ||
             req.path === '/gen_204') {
-          return res.status(204).send(); // Respuesta exitosa sin contenido
+          return res.status(200).send('Success'); // iOS necesita respuesta exitosa
         }
         
         if (req.path === '/connecttest.txt' || req.path === '/ncsi.txt') {
           return res.send('Microsoft Connect Test');
         }
+        
+        // Para otras peticiones, marcar como autenticado
+        req.isAuthenticated = true;
+        req.clientMAC = mac;
+      } else {
+        console.log(`❌ Cliente NO autenticado: MAC=${mac}`);
+        req.isAuthenticated = false;
       }
     }
     
