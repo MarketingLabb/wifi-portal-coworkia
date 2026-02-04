@@ -6,7 +6,8 @@ const codeRoutes = require('./routes/codes');
 const authRoutes = require('./routes/auth');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 80;
+const HOST = '0.0.0.0'; // Escuchar en todas las interfaces
 
 // Middleware
 app.use(cors());
@@ -31,7 +32,8 @@ app.get('/admin', (req, res) => {
 // Inicializar base de datos
 initialize();
 
-app.listen(PORT, () => {
-  console.log(`🚀 Sistema WiFi Coworkia ejecutándose en http://localhost:${PORT}`);
-  console.log(`📊 Dashboard Admin: http://localhost:${PORT}/admin`);
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Sistema WiFi Coworkia ejecutándose en http://192.168.0.62:${PORT}`);
+  console.log(`📊 Dashboard Admin: http://192.168.0.62:${PORT}/admin`);
+  console.log(`🌐 Accesible desde toda la red en puerto ${PORT}`);
 });
