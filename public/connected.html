@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -32,15 +32,21 @@
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto 20px;
-            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            overflow: hidden;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         h1 {
@@ -66,7 +72,7 @@
         .timer {
             font-size: 48px;
             font-weight: bold;
-            color: #667eea;
+            color: #0d9488;
             margin-bottom: 10px;
             font-variant-numeric: tabular-nums;
         }
@@ -95,7 +101,7 @@
 
         .close-btn {
             margin-top: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -109,7 +115,9 @@
 </head>
 <body>
     <div class="container">
-        <div class="logo">✓</div>
+        <div class="logo">
+            <img src="/images/coworkia-logo.png" alt="Coworkia" onerror="this.parentElement.innerHTML='<div style=\'font-size:50px;color:#0d9488\'>✓</div>'">
+        </div>
         <h1>¡Ya estás conectado!</h1>
         <p class="status">Navegación activa</p>
         
