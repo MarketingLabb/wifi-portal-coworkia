@@ -23,7 +23,7 @@ app.use(async (req, res, next) => {
     
     if (mac) {
       // Verificar si tiene sesión activa
-      const session = db().prepare(`
+      const session = db.prepare(`
         SELECT * FROM sessions 
         WHERE mac_address = ? 
         AND disconnected_at IS NULL 
