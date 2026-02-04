@@ -13,6 +13,13 @@ const HOST = '0.0.0.0'; // Escuchar en todas las interfaces
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Log todas las peticiones
+app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.url} - Host: ${req.headers.host}`);
+  next();
+});
+
 app.use(express.static('public'));
 
 // Routes
@@ -29,11 +36,31 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Capturar TODAS las peticiones y redirigir al portal (portal cautivo)
+app.get('*', (req, res) => {
+  // Si no es una ruta API, mostrar el portal
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 // Inicializar base de datos
 initialize();
 
+// Escuchar en puerto 80 (HTTP)
 app.listen(PORT, HOST, () => {
-  console.log(`🚀 Sistema WiFi Coworkia ejecutándose en http://192.168.0.62:${PORT}`);
-  console.log(`📊 Dashboard Admin: http://192.168.0.62:${PORT}/admin`);
+  console.log(`🚀 Sistema WiFi Coworkia ejecutándose en http://192.168.2.2:${PORT}`);
+  console.log(`📊 Dashboard Admin: http://192.168.2.2:${PORT}/admin`);
   console.log(`🌐 Accesible desde toda la red en puerto ${PORT}`);
+});
+
+// Escuchar también en puerto 443 (HTTPS) redirigiendo a HTTP
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+
+// Crear servidor HTTPS con certificado autofirmado (para que Safari no se queje)
+// Por ahora, simplemente redirigir 443 a 80
+const httpsPort = 443;
+const httpsServer = http.createServer(app);
+httpsServer.listen(httpsPort, HOST, () => {
+  console.log(`🔒 Portal también escuchando en puerto ${httpsPort} (redirige HTTPS a HTTP)`);
 });
