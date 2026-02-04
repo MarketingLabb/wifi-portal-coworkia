@@ -36,6 +36,33 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Detección de portal cautivo para iOS
+app.get('/hotspot-detect.html', (req, res) => {
+  res.redirect(302, '/');
+});
+
+app.get('/library/test/success.html', (req, res) => {
+  res.redirect(302, '/');
+});
+
+// Detección de portal cautivo para Android
+app.get('/generate_204', (req, res) => {
+  res.redirect(302, '/');
+});
+
+app.get('/gen_204', (req, res) => {
+  res.redirect(302, '/');
+});
+
+// Detección de portal cautivo para Windows
+app.get('/ncsi.txt', (req, res) => {
+  res.redirect(302, '/');
+});
+
+app.get('/connecttest.txt', (req, res) => {
+  res.redirect(302, '/');
+});
+
 // Capturar TODAS las peticiones y redirigir al portal (portal cautivo)
 app.get('*', (req, res) => {
   // Si no es una ruta API, mostrar el portal
