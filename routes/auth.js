@@ -14,6 +14,60 @@ router.post('/validate', async (req, res) => {
     const { ip, mac } = await getClientInfo(req);
     console.log(`🔍 Cliente conectando: IP=${ip}, MAC=${mac}`);
     
+    // VERIFICAR HORARIO: No permitir códigos entre 8pm y 8:25am
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    
+    if (hour >= 20 || (hour < 8) || (hour === 8 && minute < 25)) {
+      console.log(`🚫 Código rechazado fuera de horario: ${hour}:${minute}`);
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Horario no disponible',
+        message: 'El WiFi está disponible de 8:25am a 8:00pm. Vuelve mañana a las 8:25am.'
+      });
+    }
+    
+    // VERIFICAR SI YA TIENE SESIÓN ACTIVA
+    if (mac) {
+      const existingSession = db.prepare(`
+        SELECT * FROM sessions 
+        WHERE mac_address = ? 
+        AND disconnected_at IS NULL 
+        AND datetime(expires_at) > datetime('now')
+        ORDER BY started_at DESC 
+        LIMIT 1
+      `).get(mac);
+      
+      if (existingSession) {
+        const expiresAt = new Date(existingSession.expires_at);
+        const now = new Date();
+        const minutesLeft = Math.floor((expiresAt - now) / (1000 * 60));
+        const hoursLeft = Math.floor(minutesLeft / 60);
+        const minsLeft = minutesLeft % 60;
+        
+        console.log(`⚠️  Cliente ${mac} intentó usar código teniendo sesión activa`);
+        
+        // ANULAR EL CÓDIGO INGRESADO
+        db.prepare(`
+          UPDATE codes 
+          SET status = 'anulado'
+          WHERE code = ?
+        `).run(code);
+        
+        return res.status(403).json({ 
+          success: false, 
+          error: 'Ya tienes una sesión activa',
+          message: `Ya tienes conexión activa. Te quedan ${hoursLeft}h ${minsLeft}min de navegación. El código ingresado ha sido anulado. Acércate al administrador si necesitas más tiempo.`,
+          timeLeft: {
+            hours: hoursLeft,
+            minutes: minsLeft,
+            expiresAt: existingSession.expires_at
+          }
+        });
+      }
+    }
+    
     // Validar formato
     if (!validateFormat(code)) {
       return res.status(400).json({ 
