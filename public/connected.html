@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectado - Coworkia WiFi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        h1 {
+            color: #1f2937;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            color: #22c55e;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .disconnect-time {
+            color: #374151;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .disconnect-time strong {
+            color: #1f2937;
+        }
+
+        .footer {
+            margin-top: 20px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .close-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">✓</div>
+        <h1>¡Ya estás conectado!</h1>
+        <p class="status">Navegación activa</p>
+        
+        <div class="info-box">
+            <div class="timer" id="timer">--:--:--</div>
+            <div class="timer-label">Tiempo restante</div>
+            <div class="disconnect-time">
+                <strong>Tu sesión finalizará:</strong><br>
+                <span id="disconnect-time">Cargando...</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            Disfruta tu navegación en Coworkia WiFi
+        </div>
+
+        <button class="close-btn" onclick="window.location.href='done'">Cerrar</button>
+    </div>
+
+    <script>
+        // Obtener tiempo de expiración del servidor
+        fetch('/api/auth/session-info')
+            .then(res => res.json())
+            .then(data => {
+                if (data.expiresAt) {
+                    const expiresAt = new Date(data.expiresAt);
+                    
+                    // Mostrar hora de desconexión
+                    document.getElementById('disconnect-time').textContent = 
+                        expiresAt.toLocaleString('es-MX', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    
+                    // Actualizar contador cada segundo
+                    function updateTimer() {
+                        const now = new Date();
+                        const diff = expiresAt - now;
+                        
+                        if (diff <= 0) {
+                            document.getElementById('timer').textContent = '00:00:00';
+                            return;
+                        }
+                        
+                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                        
+                        document.getElementById('timer').textContent = 
+                            `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    }
+                    
+                    updateTimer();
+                    setInterval(updateTimer, 1000);
+                }
+            })
+            .catch(err => {
+                console.error('Error obteniendo info de sesión:', err);
+            });
+    </script>
+</body>
+</html>

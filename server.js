@@ -37,12 +37,12 @@ app.use(async (req, res, next) => {
       if (session) {
         console.log(`✅ Cliente autenticado: MAC=${mac}, expira en ${session.expires_at}`);
         
-        // Cliente autenticado - responder correctamente a detección de portal
+        // Cliente autenticado - mostrar página de estado
         if (req.path === '/hotspot-detect.html' || 
             req.path === '/library/test/success.html' ||
             req.path === '/generate_204' ||
             req.path === '/gen_204') {
-          return res.status(200).send('Success'); // iOS necesita respuesta exitosa
+          return res.sendFile(path.join(__dirname, 'public', 'connected.html'));
         }
         
         if (req.path === '/connecttest.txt' || req.path === '/ncsi.txt') {
@@ -52,6 +52,7 @@ app.use(async (req, res, next) => {
         // Para otras peticiones, marcar como autenticado
         req.isAuthenticated = true;
         req.clientMAC = mac;
+        req.sessionExpires = session.expires_at;
       } else {
         console.log(`❌ Cliente NO autenticado: MAC=${mac}`);
         req.isAuthenticated = false;
@@ -72,6 +73,37 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static('public'));
+
+// Endpoint para obtener info de sesión actual
+app.get('/api/auth/session-info', async (req, res) => {
+  try {
+    const { mac } = await getClientInfo(req);
+    
+    if (mac) {
+      const session = db.prepare(`
+        SELECT * FROM sessions 
+        WHERE mac_address = ? 
+        AND disconnected_at IS NULL 
+        AND datetime(expires_at) > datetime('now')
+        ORDER BY started_at DESC 
+        LIMIT 1
+      `).get(mac);
+      
+      if (session) {
+        return res.json({
+          connected: true,
+          expiresAt: session.expires_at,
+          startedAt: session.started_at
+        });
+      }
+    }
+    
+    res.json({ connected: false });
+  } catch (error) {
+    console.error('Error obteniendo info de sesión:', error);
+    res.status(500).json({ error: 'Error obteniendo información' });
+  }
+});
 
 // Routes
 app.use('/api/codes', codeRoutes);
