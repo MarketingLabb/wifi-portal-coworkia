@@ -1,6 +1,6 @@
 # 🚀 Próximo Desarrollo - Sistema WiFi Coworkia
 
-## 📍 Estado Actual (4 Feb 2026)
+## 📍 Estado Actual (4 Feb 2026 - 19:15)
 
 ✅ **SISTEMA FUNCIONANDO AL 100%**
 - Portal cautivo automático
@@ -8,6 +8,54 @@
 - Horario 8:25am-8pm
 - Bloqueo códigos duplicados
 - Navegación libre post-auth
+- Scripts de desconexión creados
+
+⚠️ **PENDIENTE CONFIGURAR:**
+- Cron job para desconexión automática 8pm
+- Elegir script de desconexión (seguro vs agresivo)
+
+---
+
+## 🔧 Tareas Inmediatas (Próxima Sesión)
+
+### 1. Configurar Cron Job de Desconexión 8pm ⏰
+**Prioridad: ALTA - PENDIENTE**
+
+**Comando a ejecutar en Mac Mini:**
+```bash
+# Ver cron actual
+crontab -l
+
+# Agregar desconexión automática 8pm
+(crontab -l 2>/dev/null; echo "0 20 * * * ~/wifi-portal-coworkia/scripts/auto-disconnect-8pm.sh") | crontab -
+
+# Verificar
+crontab -l
+```
+
+**Resultado esperado:** 
+- Todos los dispositivos se desconectan a las 8pm
+- WiFi vuelve a estar disponible a las 8:25am
+
+---
+
+### 2. Decidir Script de Desconexión Manual 🔌
+**Prioridad: MEDIA - PENDIENTE DECISIÓN**
+
+**Opciones disponibles:**
+
+**A) disconnect-all-safe.sh** ✅ RECOMENDADO
+- Solo marca sesiones como desconectadas en DB
+- NO toca red ni firewall
+- Dispositivos pierden internet en 30-60 segundos
+- **100% seguro, no rompe nada**
+
+**B) disconnect-all.sh** ⚠️ AGRESIVO
+- Marca sesiones + elimina entradas ARP
+- Desconexión inmediata
+- Puede causar problemas de red temporales
+
+**Decisión:** Probar ambos en producción y elegir el que funcione mejor
 
 ---
 
