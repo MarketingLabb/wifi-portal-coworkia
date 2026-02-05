@@ -101,8 +101,8 @@ router.post('/validate', async (req, res) => {
     }
     
     // Crear sesión (2 horas = 7200000 ms)
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    const sessionStart = new Date();
+    const expiresAt = new Date(sessionStart.getTime() + 2 * 60 * 60 * 1000);
     
     // Actualizar código
     db.prepare(`
@@ -113,7 +113,7 @@ router.post('/validate', async (req, res) => {
           client_name = ?,
           client_device = ?
       WHERE code = ?
-    `).run(now.toISOString(), expiresAt.toISOString(), clientName || null, deviceInfo || null, code);
+    `).run(sessionStart.toISOString(), expiresAt.toISOString(), clientName || null, deviceInfo || null, code);
     
     // Crear sesión
     const session = db.prepare(`
