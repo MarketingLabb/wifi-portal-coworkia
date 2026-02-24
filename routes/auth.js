@@ -3,7 +3,7 @@ const router = express.Router();
 const { db } = require('../database/db');
 const { validateFormat } = require('../utils/codeGenerator');
 const { getClientInfo } = require('../utils/macHelper');
-const { allowMAC } = require('../utils/firewallManager');
+const { syncFirewallWithDatabase } = require('../utils/firewallManager');
 
 // Validar código y crear sesión
 router.post('/validate', async (req, res) => {
@@ -41,8 +41,8 @@ router.post('/validate', async (req, res) => {
       
       if (existingSession) {
         const expiresAt = new Date(existingSession.expires_at);
-        const now = new Date();
-        const minutesLeft = Math.floor((expiresAt - now) / (1000 * 60));
+        const current = new Date();
+        const minutesLeft = Math.floor((expiresAt - current) / (1000 * 60));
         const hoursLeft = Math.floor(minutesLeft / 60);
         const minsLeft = minutesLeft % 60;
         
@@ -123,16 +123,12 @@ router.post('/validate', async (req, res) => {
     
     console.log(`✅ Sesión creada: Código=${code}, IP=${ip}, MAC=${mac}`);
     
-    // Desbloquear acceso a internet para esta MAC
-    if (mac) {
-      const unlocked = await allowMAC(mac);
-      if (unlocked) {
-        console.log(`🔓 Internet desbloqueado para MAC ${mac}`);
-      } else {
-        console.warn(`⚠️  No se pudo desbloquear MAC ${mac}, pero sesión creada`);
-      }
+    // Sincronizar firewall con DB (fuente de verdad unica)
+    const synced = await syncFirewallWithDatabase();
+    if (synced) {
+      console.log('🔓 Firewall sincronizado con sesiones activas');
     } else {
-      console.warn('⚠️  No se pudo obtener MAC address del cliente');
+      console.warn('⚠️  Sesión creada, pero no se pudo sincronizar firewall');
     }
     
     res.json({ 

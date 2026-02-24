@@ -9,6 +9,14 @@ const { getClientInfo } = require('./utils/macHelper');
 const app = express();
 const PORT = process.env.PORT || 80;
 const HOST = '0.0.0.0'; // Escuchar en todas las interfaces
+const CAPTIVE_PROBE_PATHS = new Set([
+  '/hotspot-detect.html',
+  '/library/test/success.html',
+  '/generate_204',
+  '/gen_204',
+  '/connecttest.txt',
+  '/ncsi.txt'
+]);
 
 // Middleware
 app.use(cors());
@@ -36,21 +44,7 @@ app.use(async (req, res, next) => {
       
       if (session) {
         console.log(`✅ Cliente autenticado: MAC=${mac}, expira en ${session.expires_at}`);
-        
-        // Cliente autenticado - cerrar portal automáticamente
-        if (req.path === '/hotspot-detect.html' || 
-            req.path === '/library/test/success.html') {
-          return res.status(200).send('<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>');
-        }
-        
-        if (req.path === '/generate_204' || req.path === '/gen_204') {
-          return res.status(204).send();
-        }
-        
-        if (req.path === '/connecttest.txt' || req.path === '/ncsi.txt') {
-          return res.send('Microsoft Connect Test');
-        }
-        
+
         // Para otras peticiones, marcar como autenticado
         req.isAuthenticated = true;
         req.clientMAC = mac;
@@ -113,6 +107,9 @@ app.use('/api/auth', authRoutes);
 
 // Servir el portal de autenticación
 app.get('/', (req, res) => {
+  if (req.isAuthenticated) {
+    return res.redirect(302, '/connected.html');
+  }
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
@@ -121,35 +118,19 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Detección de portal cautivo para iOS
-app.get('/hotspot-detect.html', (req, res) => {
-  res.redirect(302, '/');
-});
-
-app.get('/library/test/success.html', (req, res) => {
-  res.redirect(302, '/');
-});
-
-// Detección de portal cautivo para Android
-app.get('/generate_204', (req, res) => {
-  res.redirect(302, '/');
-});
-
-app.get('/gen_204', (req, res) => {
-  res.redirect(302, '/');
-});
-
-// Detección de portal cautivo para Windows
-app.get('/ncsi.txt', (req, res) => {
-  res.redirect(302, '/');
-});
-
-app.get('/connecttest.txt', (req, res) => {
-  res.redirect(302, '/');
+// Endpoints de detección de portal cautivo
+app.get(Array.from(CAPTIVE_PROBE_PATHS), (req, res) => {
+  if (req.isAuthenticated) {
+    return res.redirect(302, '/connected.html');
+  }
+  return res.redirect(302, '/');
 });
 
 // Capturar TODAS las peticiones y redirigir al portal (portal cautivo)
 app.get('*', (req, res) => {
+  if (req.isAuthenticated) {
+    return res.redirect(302, '/connected.html');
+  }
   // Si no es una ruta API, mostrar el portal
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
@@ -166,11 +147,7 @@ app.listen(PORT, HOST, () => {
 
 // Escuchar también en puerto 443 (HTTPS) redirigiendo a HTTP
 const http = require('http');
-const https = require('https');
-const fs = require('fs');
-
-// Crear servidor HTTPS con certificado autofirmado (para que Safari no se queje)
-// Por ahora, simplemente redirigir 443 a 80
+// Escuchar también en 443 para capturar intentos HTTPS del portal cautivo
 const httpsPort = 443;
 const httpsServer = http.createServer(app);
 httpsServer.listen(httpsPort, HOST, () => {

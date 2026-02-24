@@ -81,7 +81,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       
       // Redirigir después de 2 segundos
       setTimeout(() => {
-        window.location.href = 'https://google.com';
+        window.location.href = '/connected.html';
       }, 2000);
     } else {
       showMessage(`Error: ${data.error}`, 'error');

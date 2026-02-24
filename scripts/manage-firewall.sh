@@ -4,6 +4,38 @@
 # Archivos de configuración
 PF_ANCHOR="/etc/pf.anchors/com.coworkia.captive"
 ALLOWED_MACS_FILE="/tmp/coworkia-allowed-macs.txt"
+DEFAULT_DB_PATH="$HOME/wifi-portal-coworkia/database/coworkia.db"
+
+normalize_mac() {
+    echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+sync_from_db() {
+    local db_path="${1:-$DEFAULT_DB_PATH}"
+
+    if [ ! -f "$db_path" ]; then
+        echo "❌ Base de datos no encontrada: $db_path"
+        return 1
+    fi
+
+    echo "🔄 Sincronizando MACs permitidas desde DB: $db_path"
+
+    sqlite3 "$db_path" "
+      SELECT DISTINCT lower(mac_address)
+      FROM sessions
+      WHERE mac_address IS NOT NULL
+        AND trim(mac_address) != ''
+        AND disconnected_at IS NULL
+        AND datetime(expires_at) > datetime('now')
+      ORDER BY lower(mac_address);
+    " > "$ALLOWED_MACS_FILE"
+
+    local mac_count
+    mac_count=$(grep -Ec '([0-9a-f]{2}:){5}[0-9a-f]{2}' "$ALLOWED_MACS_FILE" 2>/dev/null || true)
+
+    echo "✅ MACs activas en DB: $mac_count"
+    regenerate_pf_rules
+}
 
 # Función para permitir acceso a una MAC
 allow_mac() {
@@ -14,6 +46,8 @@ allow_mac() {
         return 1
     fi
     
+    mac=$(normalize_mac "$mac")
+
     # Agregar MAC a la lista si no existe
     if ! grep -q "$mac" "$ALLOWED_MACS_FILE" 2>/dev/null; then
         echo "$mac" >> "$ALLOWED_MACS_FILE"
@@ -35,6 +69,8 @@ deny_mac() {
         return 1
     fi
     
+    mac=$(normalize_mac "$mac")
+
     # Remover MAC de la lista
     if [ -f "$ALLOWED_MACS_FILE" ]; then
         grep -v "$mac" "$ALLOWED_MACS_FILE" > "$ALLOWED_MACS_FILE.tmp"
@@ -69,7 +105,7 @@ EOF
             if [ -n "$mac" ]; then
                 # Permitir TODO el tráfico de MACs autenticadas
                 echo "# Permitir MAC autenticada: $mac" >> "$PF_ANCHOR"
-                echo "pass quick on bridge100 from any to any mac-src $mac" >> "$PF_ANCHOR"
+                echo "pass quick on bridge100 from any to any mac-src $(normalize_mac "$mac")" >> "$PF_ANCHOR"
             fi
         done < "$ALLOWED_MACS_FILE"
     fi
@@ -106,6 +142,9 @@ cleanup_expired() {
 
 # Main
 case "$1" in
+    sync-db)
+        sync_from_db "$2"
+        ;;
     allow)
         allow_mac "$2"
         ;;
@@ -122,9 +161,10 @@ case "$1" in
         regenerate_pf_rules
         ;;
     *)
-        echo "Uso: $0 {allow|deny|list|cleanup|regenerate} [mac-address]"
+        echo "Uso: $0 {sync-db|allow|deny|list|cleanup|regenerate} [arg]"
         echo ""
         echo "Comandos:"
+        echo "  sync-db [DB]  - Sincronizar MACs permitidas desde sesiones activas de DB"
         echo "  allow MAC     - Permitir acceso a internet para una MAC"
         echo "  deny MAC      - Bloquear acceso a internet para una MAC"
         echo "  list          - Listar MACs con acceso permitido"

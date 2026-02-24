@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Script SEGURO para desconectar dispositivos
-# Solo marca en DB, sin tocar red ni firewall
+# Marca en DB y sincroniza firewall sin forzar cortes agresivos de red
 
 DB_PATH=~/wifi-portal-coworkia/database/coworkia.db
+FIREWALL_SCRIPT=~/wifi-portal-coworkia/scripts/manage-firewall.sh
 
 echo "🔴 Desconectando todos los dispositivos..."
 
@@ -31,6 +32,11 @@ fi
 
 # Desconectar en DB
 sqlite3 "$DB_PATH" "UPDATE sessions SET disconnected_at = datetime('now') WHERE disconnected_at IS NULL;"
+
+# Reflejar inmediatamente en firewall
+if [ -x "$FIREWALL_SCRIPT" ]; then
+  sudo "$FIREWALL_SCRIPT" sync-db "$DB_PATH" >/dev/null 2>&1
+fi
 
 echo "✅ $ACTIVE sesión(es) marcadas como desconectadas"
 echo ""
