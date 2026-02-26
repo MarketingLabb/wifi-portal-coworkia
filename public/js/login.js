@@ -2,9 +2,14 @@
 let currentSlide = 0;
 let slideTimer = null;
 let carouselSlides = [];
+let audioToggleBtn = null;
 
 // Cargar carrusel al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
+  audioToggleBtn = document.getElementById('audioToggleBtn');
+  if (audioToggleBtn) {
+    audioToggleBtn.addEventListener('click', toggleCurrentVideoAudio);
+  }
   loadCarousel();
   formatCodeInput();
 });
@@ -160,12 +165,14 @@ function scheduleCurrentSlideTransition() {
   if (slide.type === 'video') {
     const video = activeSlide.querySelector('video');
     if (!video) {
+      updateAudioToggleButton(null);
       slideTimer = setTimeout(() => changeSlide(1), 8000);
       return;
     }
 
     video.currentTime = 0;
     video.onended = () => changeSlide(1);
+    updateAudioToggleButton(video);
 
     video.play().catch(() => {
       slideTimer = setTimeout(() => changeSlide(1), 35000);
@@ -173,8 +180,37 @@ function scheduleCurrentSlideTransition() {
     return;
   }
 
+  updateAudioToggleButton(null);
+
   const durationMs = typeof slide.durationMs === 'number' ? slide.durationMs : 6000;
   slideTimer = setTimeout(() => changeSlide(1), durationMs);
+}
+
+function getActiveVideoElement() {
+  const activeSlide = document.querySelectorAll('.carousel-slide')[currentSlide];
+  if (!activeSlide) return null;
+  return activeSlide.querySelector('video');
+}
+
+function updateAudioToggleButton(video) {
+  if (!audioToggleBtn) return;
+
+  if (!video) {
+    audioToggleBtn.style.display = 'none';
+    return;
+  }
+
+  audioToggleBtn.style.display = 'inline-flex';
+  audioToggleBtn.textContent = video.muted ? '🔇 Activar sonido' : '🔊 Silenciar';
+}
+
+function toggleCurrentVideoAudio() {
+  const video = getActiveVideoElement();
+  if (!video) return;
+
+  video.muted = !video.muted;
+  video.play().catch(() => {});
+  updateAudioToggleButton(video);
 }
 
 // Formatear entrada de código automáticamente

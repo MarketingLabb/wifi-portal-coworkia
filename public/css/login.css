@@ -177,6 +177,27 @@ body {
   background: rgba(255, 255, 255, 0.8);
 }
 
+.audio-toggle {
+  margin: 10px auto 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(78, 205, 196, 0.35);
+  background: rgba(255, 255, 255, 0.75);
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.audio-toggle:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(78, 205, 196, 0.6);
+}
+
 .ad-footer-text {
   color: #374151;
   font-size: 14px;
