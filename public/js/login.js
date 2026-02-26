@@ -79,10 +79,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     if (data.success) {
       showMessage('¡Conectado exitosamente! Tienes 2 horas de acceso. Disfruta tu navegación.', 'success');
       
-      // Redirigir después de 2 segundos
+      // Redirigir a hotspot-detect para que iOS detecte Success y cierre el popup
       setTimeout(() => {
-        window.location.href = '/connected.html';
-      }, 2000);
+        window.location.href = '/hotspot-detect.html';
+      }, 1500);
     } else {
       showMessage(`Error: ${data.error}`, 'error');
       submitBtn.disabled = false;

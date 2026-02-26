@@ -121,9 +121,12 @@ app.get('/admin', (req, res) => {
 // Endpoints de detección de portal cautivo
 app.get(Array.from(CAPTIVE_PROBE_PATHS), (req, res) => {
   if (req.isAuthenticated) {
-    return res.redirect(302, '/connected.html');
+    // iOS/macOS esperan EXACTAMENTE esto para detectar internet libre y cerrar el popup
+    res.setHeader('Content-Type', 'text/html');
+    return res.send('<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>');
   }
-  return res.redirect(302, '/');
+  // No autenticado: mostrar portal de login directo (sin redirect para navegador inmersivo)
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // Capturar TODAS las peticiones y redirigir al portal (portal cautivo)
