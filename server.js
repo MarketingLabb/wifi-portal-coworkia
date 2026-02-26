@@ -120,7 +120,10 @@ app.get('/admin', (req, res) => {
 
 // Endpoints de detección de portal cautivo
 app.get(Array.from(CAPTIVE_PROBE_PATHS), (req, res) => {
-  if (req.isAuthenticated) {
+  const explicitPortalAuth = req.query && req.query.auth === '1';
+
+  // Solo devolver Success cuando el flujo viene de login exitoso
+  if (req.isAuthenticated && explicitPortalAuth) {
     // iOS/macOS esperan EXACTAMENTE esto para detectar internet libre y cerrar el popup
     res.setHeader('Content-Type', 'text/html');
     return res.send('<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>');

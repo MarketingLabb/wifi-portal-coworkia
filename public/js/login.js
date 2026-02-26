@@ -263,7 +263,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       
       // Redirigir a hotspot-detect para que iOS detecte Success y cierre el popup
       setTimeout(() => {
-        window.location.href = '/hotspot-detect.html';
+        window.location.href = '/hotspot-detect.html?auth=1';
       }, 1500);
     } else {
       showMessage(`Error: ${data.error}`, 'error');
