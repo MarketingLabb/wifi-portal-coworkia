@@ -3,3 +3,9 @@ node_modules/
 *.log
 .env
 .DS_Store
+
+# Videos grandes (copiar directamente al servidor)
+public/videos/*.mp4
+public/videos/*.webm
+public/videos/*.mov
+!public/videos/.gitkeep

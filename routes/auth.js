@@ -160,9 +160,16 @@ router.get('/ad', (req, res) => {
 // Obtener slides del carrusel multimedia
 router.get('/carousel-slides', (req, res) => {
   try {
-    // Por defecto, retornar slide de Aurora
-    // Los administradores pueden agregar más slides manualmente en /public/images/ o /public/videos/
+    // Carrusel multimedia con video vertical de 33 segundos
     const slides = [
+      {
+        type: 'video',
+        src: '/videos/Michelle Coworkia V2.mp4',
+        alt: 'Video promocional Coworkia',
+        autoplay: true,  // Se reproduce automáticamente
+        loop: true,      // Se repite continuamente
+        muted: true      // Silenciado (necesario para autoplay)
+      },
       {
         type: 'image',
         src: '/images/aurora-ad.png',
@@ -171,9 +178,8 @@ router.get('/carousel-slides', (req, res) => {
         loop: false,
         muted: false
       }
-      // Ejemplos de cómo agregar más slides:
+      // Puedes agregar más slides aquí:
       // { type: 'image', src: '/images/promo1.jpg', alt: 'Promoción especial' },
-      // { type: 'video', src: '/videos/anuncio.mp4', alt: 'Video promocional', autoplay: true, loop: true, muted: true },
     ];
     
     res.json({ success: true, slides });
