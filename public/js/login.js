@@ -72,7 +72,9 @@ function renderCarousel() {
           ${slide.loop === true ? 'loop' : ''}
           ${slide.muted !== false ? 'muted' : ''}
           playsinline
-          preload="metadata"
+          webkit-playsinline
+          disablepictureinpicture
+          preload="auto"
         ></video>
       `;
     } else {
