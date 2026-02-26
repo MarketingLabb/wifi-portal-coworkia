@@ -74,7 +74,7 @@ function renderCarousel() {
           playsinline
           webkit-playsinline
           disablepictureinpicture
-          preload="auto"
+          preload="metadata"
         ></video>
       `;
     } else {
@@ -175,6 +175,7 @@ function scheduleCurrentSlideTransition() {
     video.currentTime = 0;
     video.onended = () => changeSlide(1);
     updateAudioToggleButton(video);
+    video.load();
 
     video.play().catch(() => {
       slideTimer = setTimeout(() => changeSlide(1), 35000);

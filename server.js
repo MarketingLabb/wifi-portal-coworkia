@@ -68,6 +68,13 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/videos', express.static(path.join(__dirname, 'public', 'videos'), {
+  maxAge: '7d',
+  immutable: true,
+  etag: true,
+  lastModified: true
+}));
+
 app.use(express.static('public'));
 
 // Endpoint para obtener info de sesión actual
