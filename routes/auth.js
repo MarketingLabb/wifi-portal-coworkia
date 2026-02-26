@@ -14,19 +14,19 @@ router.post('/validate', async (req, res) => {
     const { ip, mac } = await getClientInfo(req);
     console.log(`🔍 Cliente conectando: IP=${ip}, MAC=${mac}`);
     
-    // VERIFICAR HORARIO: No permitir códigos entre 8pm y 8:25am
-    const now = new Date();
-    const hour = now.getHours();
-    const minute = now.getMinutes();
-    
-    if (hour >= 20 || (hour < 8) || (hour === 8 && minute < 25)) {
-      console.log(`🚫 Código rechazado fuera de horario: ${hour}:${minute}`);
-      return res.status(403).json({ 
-        success: false, 
-        error: 'Horario no disponible',
-        message: 'El WiFi está disponible de 8:25am a 8:00pm. Vuelve mañana a las 8:25am.'
-      });
-    }
+    // VERIFICAR HORARIO: DESHABILITADO - Sistema 24/7 hasta que se instale router dedicado
+    // const now = new Date();
+    // const hour = now.getHours();
+    // const minute = now.getMinutes();
+    // 
+    // if (hour >= 20 || (hour < 8) || (hour === 8 && minute < 25)) {
+    //   console.log(`🚫 Código rechazado fuera de horario: ${hour}:${minute}`);
+    //   return res.status(403).json({ 
+    //     success: false, 
+    //     error: 'Horario no disponible',
+    //     message: 'El WiFi está disponible de 8:25am a 8:00pm. Vuelve mañana a las 8:25am.'
+    //   });
+    // }
     
     // VERIFICAR SI YA TIENE SESIÓN ACTIVA
     if (mac) {
