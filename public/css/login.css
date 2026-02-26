@@ -107,10 +107,12 @@ body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  width: 40px;
-  height: 40px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   cursor: pointer;
   z-index: 10;
@@ -118,19 +120,21 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
 
 .carousel-control:hover {
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transform: translateY(-50%) scale(1.1);
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transform: translateY(-50%) scale(1.06);
 }
 
 .carousel-control span {
-  font-size: 30px;
-  font-weight: bold;
-  color: #4ECDC4;
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   line-height: 1;
 }
 
@@ -174,11 +178,12 @@ body {
 }
 
 .ad-footer-text {
-  color: #6B7280;
-  font-size: 13px;
+  color: #374151;
+  font-size: 14px;
   text-align: center;
-  margin: 10px 0 0 0;
-  font-weight: 500;
+  margin: 12px 0 0 0;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .ad-link {
