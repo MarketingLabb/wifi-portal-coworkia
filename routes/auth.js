@@ -160,26 +160,22 @@ router.get('/ad', (req, res) => {
 // Obtener slides del carrusel multimedia
 router.get('/carousel-slides', (req, res) => {
   try {
-    // Carrusel multimedia con video vertical de 33 segundos
+    // Secuencia: primero arte Aurora, luego video vertical completo
     const slides = [
-      {
-        type: 'video',
-        src: '/videos/Michelle Coworkia V2.mp4',
-        alt: 'Video promocional Coworkia',
-        autoplay: true,  // Se reproduce automáticamente
-        loop: true,      // Se repite continuamente
-        muted: true      // Silenciado (necesario para autoplay)
-      },
       {
         type: 'image',
         src: '/images/aurora-ad.png',
         alt: 'Aurora - Tu asistente virtual',
-        autoplay: false,
+        durationMs: 5000
+      },
+      {
+        type: 'video',
+        src: '/videos/promo-coworkia.mp4',
+        alt: 'Video promocional Coworkia',
+        autoplay: true,
         loop: false,
-        muted: false
+        muted: true      // Silenciado (necesario para autoplay)
       }
-      // Puedes agregar más slides aquí:
-      // { type: 'image', src: '/images/promo1.jpg', alt: 'Promoción especial' },
     ];
     
     res.json({ success: true, slides });

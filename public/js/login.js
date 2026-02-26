@@ -1,6 +1,6 @@
 // Estado del carrusel
 let currentSlide = 0;
-let carouselInterval = null;
+let slideTimer = null;
 let carouselSlides = [];
 
 // Cargar carrusel al cargar la página
@@ -33,7 +33,7 @@ async function loadCarousel() {
     // Renderizar carrusel
     renderCarousel();
     initCarouselControls();
-    startAutoPlay();
+    updateCarousel();
     
   } catch (error) {
     console.error('Error cargando carrusel:', error);
@@ -64,8 +64,7 @@ function renderCarousel() {
       slideDiv.innerHTML = `
         <video 
           src="${slide.src}" 
-          ${slide.autoplay !== false ? 'autoplay' : ''}
-          ${slide.loop !== false ? 'loop' : ''}
+          ${slide.loop === true ? 'loop' : ''}
           ${slide.muted !== false ? 'muted' : ''}
           playsinline
           preload="metadata"
@@ -103,6 +102,8 @@ function initCarouselControls() {
 
 // Cambiar slide
 function changeSlide(direction) {
+  clearTimeout(slideTimer);
+
   currentSlide += direction;
   
   if (currentSlide < 0) {
@@ -112,14 +113,14 @@ function changeSlide(direction) {
   }
   
   updateCarousel();
-  resetAutoPlay();
 }
 
 // Ir a slide específico
 function goToSlide(index) {
+  clearTimeout(slideTimer);
+
   currentSlide = index;
   updateCarousel();
-  resetAutoPlay();
 }
 
 // Actualizar visualización del carrusel
@@ -135,30 +136,45 @@ function updateCarousel() {
     indicator.classList.toggle('active', index === currentSlide);
   });
   
-  // Pausar videos no visibles y reproducir el actual
-  const videos = carouselInner.querySelectorAll('video');
-  videos.forEach((video, index) => {
-    if (index === currentSlide) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
+  scheduleCurrentSlideTransition();
+}
+
+function scheduleCurrentSlideTransition() {
+  clearTimeout(slideTimer);
+
+  if (carouselSlides.length <= 1) {
+    const onlyVideo = document.querySelector('.carousel-slide video');
+    if (onlyVideo) {
+      onlyVideo.play().catch(() => {});
     }
-  });
-}
+    return;
+  }
 
-// Auto-play del carrusel
-function startAutoPlay() {
-  if (carouselSlides.length <= 1) return;
-  
-  carouselInterval = setInterval(() => {
-    changeSlide(1);
-  }, 5000); // Cambiar cada 5 segundos
-}
+  const slide = carouselSlides[currentSlide];
+  const activeSlide = document.querySelectorAll('.carousel-slide')[currentSlide];
 
-// Resetear auto-play
-function resetAutoPlay() {
-  clearInterval(carouselInterval);
-  startAutoPlay();
+  if (!slide || !activeSlide) {
+    return;
+  }
+
+  if (slide.type === 'video') {
+    const video = activeSlide.querySelector('video');
+    if (!video) {
+      slideTimer = setTimeout(() => changeSlide(1), 8000);
+      return;
+    }
+
+    video.currentTime = 0;
+    video.onended = () => changeSlide(1);
+
+    video.play().catch(() => {
+      slideTimer = setTimeout(() => changeSlide(1), 35000);
+    });
+    return;
+  }
+
+  const durationMs = typeof slide.durationMs === 'number' ? slide.durationMs : 6000;
+  slideTimer = setTimeout(() => changeSlide(1), durationMs);
 }
 
 // Formatear entrada de código automáticamente
