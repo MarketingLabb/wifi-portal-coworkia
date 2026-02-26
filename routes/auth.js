@@ -157,6 +157,31 @@ router.get('/ad', (req, res) => {
   }
 });
 
+// Obtener slides del carrusel multimedia
+router.get('/carousel-slides', (req, res) => {
+  try {
+    // Por defecto, retornar slide de Aurora
+    // Los administradores pueden agregar más slides manualmente en /public/images/ o /public/videos/
+    const slides = [
+      {
+        type: 'image',
+        src: '/images/aurora-ad.png',
+        alt: 'Aurora - Tu asistente virtual',
+        autoplay: false,
+        loop: false,
+        muted: false
+      }
+      // Ejemplos de cómo agregar más slides:
+      // { type: 'image', src: '/images/promo1.jpg', alt: 'Promoción especial' },
+      // { type: 'video', src: '/videos/anuncio.mp4', alt: 'Video promocional', autoplay: true, loop: true, muted: true },
+    ];
+    
+    res.json({ success: true, slides });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Verificar sesión activa
 router.get('/session/:code', (req, res) => {
   try {
