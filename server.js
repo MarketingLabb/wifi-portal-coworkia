@@ -23,8 +23,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const STATIC_ASSET_REGEX = /^\/(css|js|images|videos)\//;
+
+function isStaticAssetRequest(req) {
+  return STATIC_ASSET_REGEX.test(req.path) || req.path === '/favicon.ico';
+}
+
 // Middleware para verificar si el cliente ya está autenticado
 app.use(async (req, res, next) => {
+  if (isStaticAssetRequest(req)) {
+    return next();
+  }
+
   try {
     // Obtener MAC del cliente
     const { ip, mac } = await getClientInfo(req);
@@ -64,7 +74,9 @@ app.use(async (req, res, next) => {
 
 // Log todas las peticiones
 app.use((req, res, next) => {
-  console.log(`📥 ${req.method} ${req.url} - Host: ${req.headers.host}`);
+  if (!isStaticAssetRequest(req)) {
+    console.log(`📥 ${req.method} ${req.url} - Host: ${req.headers.host}`);
+  }
   next();
 });
 
