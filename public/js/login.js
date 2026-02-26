@@ -3,6 +3,7 @@ let currentSlide = 0;
 let slideTimer = null;
 let carouselSlides = [];
 let audioToggleBtn = null;
+const AD_IMPACT_LOCK_MS = 7000;
 
 // Cargar carrusel al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,9 +11,57 @@ document.addEventListener('DOMContentLoaded', () => {
   if (audioToggleBtn) {
     audioToggleBtn.addEventListener('click', toggleCurrentVideoAudio);
   }
+  initializeMobileInputExposureLock();
   loadCarousel();
   formatCodeInput();
 });
+
+function initializeMobileInputExposureLock() {
+  const codeInput = document.getElementById('code');
+  const nameInput = document.getElementById('clientName');
+  const inputs = [codeInput, nameInput].filter(Boolean);
+
+  if (inputs.length === 0) {
+    return;
+  }
+
+  inputs.forEach((input) => input.setAttribute('readonly', 'readonly'));
+
+  window.scrollTo(0, 0);
+  setTimeout(() => window.scrollTo(0, 0), 120);
+  setTimeout(() => window.scrollTo(0, 0), 400);
+
+  const forceBlur = () => {
+    const activeElement = document.activeElement;
+    if (activeElement && (activeElement.id === 'code' || activeElement.id === 'clientName')) {
+      activeElement.blur();
+      window.scrollTo(0, 0);
+    }
+  };
+
+  forceBlur();
+  setTimeout(forceBlur, 100);
+  setTimeout(forceBlur, 350);
+
+  const unlockInputs = () => {
+    inputs.forEach((input) => input.removeAttribute('readonly'));
+    document.removeEventListener('touchstart', touchGuard, true);
+  };
+
+  const touchGuard = (event) => {
+    const target = event.target;
+    if (!target || (target.id !== 'code' && target.id !== 'clientName')) {
+      return;
+    }
+
+    event.preventDefault();
+    unlockInputs();
+    setTimeout(() => target.focus(), 60);
+  };
+
+  document.addEventListener('touchstart', touchGuard, true);
+  setTimeout(unlockInputs, AD_IMPACT_LOCK_MS);
+}
 
 // Cargar carrusel multimedia
 async function loadCarousel() {
