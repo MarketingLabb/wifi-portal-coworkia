@@ -38,6 +38,30 @@ Siempre especificar en qué equipo se ejecutará cada acción:
 2. Ajustes del usuario si necesario
 3. "verde nena" para ejecutar
 
+### Regla #7: Ejecución Guiada (Paso a Paso)
+- Cuando Diego pida "un paso a la vez", entregar **solo 1 comando por mensaje**
+- Esperar resultado del comando antes del siguiente paso
+- Evitar bloques largos de comandos que generen confusión
+
+### Regla #8: Cierre con Reporte Esperado
+- Al cerrar una implementación o despliegue, indicar explícitamente:
+   - Qué se espera ver en logs
+   - Qué se espera ver en UI (resultado visible)
+   - Señales de éxito y señales de error
+
+### Regla #9: Portal Cautivo iOS/iPadOS
+- Priorizar estabilidad del popup cautivo antes que complejidad de firewall
+- Mantener flujo robusto de autenticación para evitar cierre prematuro del popup
+- Para video en portal cautivo:
+   - Autoplay inicial en silencio
+   - Audio solo bajo acción del usuario (botón de activar sonido)
+   - Evitar archivos con bitrate excesivo para no generar pausas
+
+### Regla #10: Producción Operativa Temporal (sin router dedicado)
+- Sistema en modo operativo continuo 24/7 mientras llega router especializado
+- Cambios se validan primero en MacBook y luego se sincronizan a Mac Mini
+- Mantener respaldo y comandos de recuperación listos en todo momento
+
 ---
 
 ## PROTOCOLO DE SINCRONIZACIÓN VSC → MAC MINI 🔄
@@ -98,6 +122,27 @@ sudo node server.js
 4. **Error**: Cambios en dnsmasq/firewall no se aplican
    - **Causa**: Servicios no reiniciados
    - **Solución**: `sudo brew services restart dnsmasq` y recargar firewall
+
+---
+
+## BITÁCORA OPERATIVA - 26 FEB 2026 ✅
+
+### Objetivos cumplidos
+- Popup cautivo iPad estable y funcional
+- Carrusel multimedia operativo en portal
+- Secuencia UX ajustada: Aurora primero, video después
+- Botón para audio a discreción del usuario
+- Ajustes visuales (controles cristal + copy comercial)
+
+### Forma de trabajo validada hoy
+- Soporte remoto con ejecución guiada por comandos de 1 paso
+- Sincronización MacBook → GitHub → Mac Mini
+- Validación con evidencia en logs y prueba real en iPad
+
+### Estado actual recomendado
+- Mantener configuración actual en producción
+- Continuar iteraciones pequeñas y verificables
+- No introducir cambios grandes sin prueba en dispositivo real
 
 ---
 
