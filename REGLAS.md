@@ -62,6 +62,13 @@ Siempre especificar en qué equipo se ejecutará cada acción:
 - Cambios se validan primero en MacBook y luego se sincronizan a Mac Mini
 - Mantener respaldo y comandos de recuperación listos en todo momento
 
+### Regla #11: Deploy de Archivos Estáticos (sin reinicio)
+- Cambios en **HTML, CSS o JS del frontend** (`public/`) se reflejan inmediatamente
+- Solo se necesita hacer `git push` en MacBook → el Mac Mini sirve los archivos actualizados al instante
+- **No requiere** `git pull` en Mac Mini ni reinicio de Node.js
+- El usuario solo necesita **refrescar el browser** (Cmd+R o F5) para ver los cambios
+- Reinicio de Node **solo es necesario** cuando se modifican archivos del backend: `server.js`, `routes/`, `database/`, `utils/`
+
 ---
 
 ## PROTOCOLO DE SINCRONIZACIÓN VSC → MAC MINI 🔄
