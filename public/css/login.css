@@ -196,8 +196,8 @@ body {
 }
 
 .play-btn-holo {
-  width: 82px;
-  height: 82px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.18);
   border: 2px solid rgba(255, 255, 255, 0.55);
