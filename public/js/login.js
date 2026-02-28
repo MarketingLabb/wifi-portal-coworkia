@@ -249,7 +249,10 @@ function getActiveVideoElement() {
 
 function showPlayOverlay() {
   const overlay = document.getElementById('playOverlay');
-  if (overlay) overlay.style.display = 'flex';
+  if (overlay) {
+    overlay.style.display = 'flex';
+    setOverlayState('paused'); // siempre empieza mostrando ▶
+  }
 }
 
 function hidePlayOverlay() {
@@ -266,12 +269,36 @@ function stopCurrentVideo() {
 function onPlayOverlayClick() {
   const video = getActiveVideoElement();
   if (!video) return;
-  hidePlayOverlay();
-  video.muted = false;
-  video.play().catch(() => {
-    // Si iOS rechaza el play (raro tras gesto), fallback con timer
-    slideTimer = setTimeout(() => changeSlide(1), 35000);
-  });
+
+  if (video.paused) {
+    // Iniciar / reanudar
+    video.muted = false;
+    video.play().catch(() => {
+      slideTimer = setTimeout(() => changeSlide(1), 35000);
+    });
+    setOverlayState('playing');
+  } else {
+    // Pausar
+    video.pause();
+    setOverlayState('paused');
+  }
+}
+
+function setOverlayState(state) {
+  const overlay = document.getElementById('playOverlay');
+  const iconPlay = document.getElementById('iconPlay');
+  const iconPause = document.getElementById('iconPause');
+  if (!overlay) return;
+
+  if (state === 'playing') {
+    overlay.classList.add('playing');
+    if (iconPlay) iconPlay.style.display = 'none';
+    if (iconPause) iconPause.style.display = 'block';
+  } else {
+    overlay.classList.remove('playing');
+    if (iconPlay) iconPlay.style.display = 'block';
+    if (iconPause) iconPause.style.display = 'none';
+  }
 }
 
 // Formatear entrada de código automáticamente

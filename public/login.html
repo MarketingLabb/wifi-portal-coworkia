@@ -38,10 +38,13 @@
             <!-- Indicadores -->
             <div class="carousel-indicators" id="carouselIndicators"></div>
 
-            <!-- Holograma Play para video -->
+            <!-- Holograma Play/Pause para video -->
             <div class="play-overlay" id="playOverlay" style="display:none;">
               <div class="play-btn-holo">
-                <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M8 5v14l11-7z"/></svg>
+                <!-- Icono Play -->
+                <svg id="iconPlay" viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M8 5v14l11-7z"/></svg>
+                <!-- Icono Pause -->
+                <svg id="iconPause" viewBox="0 0 24 24" fill="white" width="26" height="26" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
               </div>
             </div>
           </div>

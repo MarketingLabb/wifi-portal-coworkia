@@ -191,6 +191,22 @@ body {
   transition: background 0.2s ease;
 }
 
+/* Cuando el video está corriendo, el overlay se vuelve casi transparente
+   pero sigue siendo clickeable para pausar */
+.play-overlay.playing {
+  background: rgba(0, 0, 0, 0.0);
+}
+
+.play-overlay.playing .play-btn-holo {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.play-overlay.playing:hover .play-btn-holo,
+.play-overlay.playing:active .play-btn-holo {
+  opacity: 1;
+}
+
 .play-overlay:hover {
   background: rgba(0, 0, 0, 0.30);
 }
