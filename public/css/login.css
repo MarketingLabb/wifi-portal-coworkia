@@ -178,63 +178,14 @@ body {
 }
 
 /* Holograma Play sobre video */
+/* Tap area invisible para play/pause del video */
 .play-overlay {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 20;
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.22);
+  background: transparent;
   border-radius: 12px;
-  transition: background 0.2s ease;
-}
-
-/* Cuando el video está corriendo, el overlay se vuelve casi transparente
-   pero sigue siendo clickeable para pausar */
-.play-overlay.playing {
-  background: rgba(0, 0, 0, 0.0);
-}
-
-.play-overlay.playing .play-btn-holo {
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-
-.play-overlay.playing:hover .play-btn-holo,
-.play-overlay.playing:active .play-btn-holo {
-  opacity: 1;
-}
-
-.play-overlay:hover {
-  background: rgba(0, 0, 0, 0.30);
-}
-
-.play-btn-holo {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  border: 2px solid rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.play-overlay:hover .play-btn-holo,
-.play-overlay:active .play-btn-holo {
-  transform: scale(1.1);
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.play-overlay svg {
-  margin-left: 5px; /* centra visualmente el triángulo */
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
 }
 
 .ad-footer-text {
