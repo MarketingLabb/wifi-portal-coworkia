@@ -2,14 +2,14 @@
 let currentSlide = 0;
 let slideTimer = null;
 let carouselSlides = [];
-let audioToggleBtn = null;
 const AD_IMPACT_LOCK_MS = 7000;
 
 // Cargar carrusel al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-  audioToggleBtn = document.getElementById('audioToggleBtn');
-  if (audioToggleBtn) {
-    audioToggleBtn.addEventListener('click', toggleCurrentVideoAudio);
+  const playOverlay = document.getElementById('playOverlay');
+  if (playOverlay) {
+    playOverlay.addEventListener('click', onPlayOverlayClick);
+    playOverlay.addEventListener('touchend', (e) => { e.preventDefault(); onPlayOverlayClick(); });
   }
   initializeMobileInputExposureLock();
   loadCarousel();
@@ -159,6 +159,7 @@ function initCarouselControls() {
 // Cambiar slide
 function changeSlide(direction) {
   clearTimeout(slideTimer);
+  stopCurrentVideo();
 
   currentSlide += direction;
   
@@ -174,6 +175,7 @@ function changeSlide(direction) {
 // Ir a slide específico
 function goToSlide(index) {
   clearTimeout(slideTimer);
+  stopCurrentVideo();
 
   currentSlide = index;
   updateCarousel();
@@ -201,7 +203,11 @@ function scheduleCurrentSlideTransition() {
   if (carouselSlides.length <= 1) {
     const onlyVideo = document.querySelector('.carousel-slide video');
     if (onlyVideo) {
-      onlyVideo.play().catch(() => {});
+      onlyVideo.muted = false;
+      onlyVideo.currentTime = 0;
+      onlyVideo.onended = () => hidePlayOverlay();
+      onlyVideo.load();
+      showPlayOverlay();
     }
     return;
   }
@@ -216,23 +222,20 @@ function scheduleCurrentSlideTransition() {
   if (slide.type === 'video') {
     const video = activeSlide.querySelector('video');
     if (!video) {
-      updateAudioToggleButton(null);
+      hidePlayOverlay();
       slideTimer = setTimeout(() => changeSlide(1), 8000);
       return;
     }
 
+    video.muted = false;
     video.currentTime = 0;
-    video.onended = () => changeSlide(1);
-    updateAudioToggleButton(video);
+    video.onended = () => { hidePlayOverlay(); changeSlide(1); };
     video.load();
-
-    video.play().catch(() => {
-      slideTimer = setTimeout(() => changeSlide(1), 35000);
-    });
+    showPlayOverlay();
     return;
   }
 
-  updateAudioToggleButton(null);
+  hidePlayOverlay();
 
   const durationMs = typeof slide.durationMs === 'number' ? slide.durationMs : 6000;
   slideTimer = setTimeout(() => changeSlide(1), durationMs);
@@ -244,25 +247,31 @@ function getActiveVideoElement() {
   return activeSlide.querySelector('video');
 }
 
-function updateAudioToggleButton(video) {
-  if (!audioToggleBtn) return;
-
-  if (!video) {
-    audioToggleBtn.style.display = 'none';
-    return;
-  }
-
-  audioToggleBtn.style.display = 'inline-flex';
-  audioToggleBtn.textContent = video.muted ? '🔇 Activar sonido' : '🔊 Silenciar';
+function showPlayOverlay() {
+  const overlay = document.getElementById('playOverlay');
+  if (overlay) overlay.style.display = 'flex';
 }
 
-function toggleCurrentVideoAudio() {
+function hidePlayOverlay() {
+  const overlay = document.getElementById('playOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function stopCurrentVideo() {
+  const video = getActiveVideoElement();
+  if (video) { video.pause(); video.currentTime = 0; }
+  hidePlayOverlay();
+}
+
+function onPlayOverlayClick() {
   const video = getActiveVideoElement();
   if (!video) return;
-
-  video.muted = !video.muted;
-  video.play().catch(() => {});
-  updateAudioToggleButton(video);
+  hidePlayOverlay();
+  video.muted = false;
+  video.play().catch(() => {
+    // Si iOS rechaza el play (raro tras gesto), fallback con timer
+    slideTimer = setTimeout(() => changeSlide(1), 35000);
+  });
 }
 
 // Formatear entrada de código automáticamente
