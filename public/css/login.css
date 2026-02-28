@@ -178,7 +178,7 @@ body {
 }
 
 /* Holograma Play sobre video */
-/* Tap area invisible para play/pause del video */
+/* Tap area para play/pause del video */
 .play-overlay {
   position: absolute;
   inset: 0;
@@ -186,6 +186,29 @@ body {
   cursor: pointer;
   background: transparent;
   border-radius: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 48px;
+}
+
+.play-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.90);
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 5px 13px;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Ocultar el hint mientras el video corre */
+.play-overlay.playing .play-hint {
+  opacity: 0;
 }
 
 .ad-footer-text {

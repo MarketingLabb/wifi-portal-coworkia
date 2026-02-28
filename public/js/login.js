@@ -249,7 +249,10 @@ function getActiveVideoElement() {
 
 function showPlayOverlay() {
   const overlay = document.getElementById('playOverlay');
-  if (overlay) overlay.style.display = 'flex';
+  if (overlay) {
+    overlay.classList.remove('playing'); // resetea hint al ▶ Toca para ver
+    overlay.style.display = 'flex';
+  }
 }
 
 function hidePlayOverlay() {
@@ -266,14 +269,17 @@ function stopCurrentVideo() {
 function onPlayOverlayClick() {
   const video = getActiveVideoElement();
   if (!video) return;
+  const overlay = document.getElementById('playOverlay');
 
   if (video.paused) {
     video.muted = false;
     video.play().catch(() => {
       slideTimer = setTimeout(() => changeSlide(1), 35000);
     });
+    if (overlay) overlay.classList.add('playing');
   } else {
     video.pause();
+    if (overlay) overlay.classList.remove('playing');
   }
 }
 
