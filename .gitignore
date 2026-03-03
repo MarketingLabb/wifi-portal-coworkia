@@ -8,4 +8,5 @@ node_modules/
 public/videos/*.mp4
 public/videos/*.webm
 public/videos/*.mov
+!public/videos/promo-coworkia.mp4
 !public/videos/.gitkeep
