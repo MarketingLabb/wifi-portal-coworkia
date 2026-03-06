@@ -27,7 +27,7 @@ const { db, initialize } = require('../database/db');
 
 const AURORA_API_URL = (process.env.AURORA_API_URL || '').replace(/\/$/, '');
 const API_KEY = process.env.WIFI_SYNC_API_KEY || '';
-const SINCE_MINUTES = 10; // Buscar códigos de los últimos 10 minutos
+const SINCE_MINUTES = 260; // Buscar códigos de las últimas 4h + margen
 
 function log(msg) {
   console.log(`[${new Date().toISOString()}] [WiFi-Sync] ${msg}`);
