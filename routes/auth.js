@@ -100,9 +100,10 @@ router.post('/validate', async (req, res) => {
       });
     }
     
-    // Crear sesión (2 horas = 7200000 ms)
+    // Crear sesión usando la duración del código (predeterminado 2 horas)
     const sessionStart = new Date();
-    const expiresAt = new Date(sessionStart.getTime() + 2 * 60 * 60 * 1000);
+    const hours = codeData.duration_hours || 2;
+    const expiresAt = new Date(sessionStart.getTime() + hours * 60 * 60 * 1000);
     
     // Actualizar código
     db.prepare(`

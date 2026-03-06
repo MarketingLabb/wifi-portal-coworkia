@@ -15,7 +15,8 @@ function initialize() {
       used_at DATETIME,
       expires_at DATETIME,
       client_name TEXT,
-      client_device TEXT
+      client_device TEXT,
+      duration_hours INTEGER DEFAULT 2
     );
 
     CREATE TABLE IF NOT EXISTS sessions (
@@ -54,6 +55,14 @@ function initialize() {
   }
 
   console.log('✅ Base de datos inicializada');
+  
+  // Migración: agregar columna duration_hours si no existe
+  try {
+    db.prepare('ALTER TABLE codes ADD COLUMN duration_hours INTEGER DEFAULT 2').run();
+    console.log('✅ Columna duration_hours agregada a codes');
+  } catch (e) {
+    // Columna ya existe, ignorar error
+  }
 }
 
 module.exports = {
