@@ -8,7 +8,7 @@ const { syncFirewallWithDatabase } = require('../utils/firewallManager');
 // Validar código y crear sesión
 router.post('/validate', async (req, res) => {
   try {
-    const { code, clientName, deviceInfo } = req.body;
+    const { code, clientName, clientPhone, privacyConsent, deviceInfo } = req.body;
     
     // Obtener IP y MAC del cliente
     const { ip, mac } = await getClientInfo(req);
@@ -117,10 +117,12 @@ router.post('/validate', async (req, res) => {
     `).run(sessionStart.toISOString(), expiresAt.toISOString(), clientName || null, deviceInfo || null, code);
     
     // Crear sesión
+    const consentGiven = privacyConsent ? 1 : 0;
+    const consentAt = consentGiven ? new Date().toISOString() : null;
     const session = db.prepare(`
-      INSERT INTO sessions (code, ip_address, mac_address, expires_at)
-      VALUES (?, ?, ?, ?)
-    `).run(code, ip, mac, expiresAt.toISOString());
+      INSERT INTO sessions (code, ip_address, mac_address, client_phone, consent_given, consent_at, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(code, ip, mac, clientPhone || null, consentGiven, consentAt, expiresAt.toISOString());
     
     console.log(`✅ Sesión creada: Código=${code}, IP=${ip}, MAC=${mac}`);
     

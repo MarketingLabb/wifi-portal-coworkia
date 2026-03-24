@@ -304,6 +304,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   
   const code = document.getElementById('code').value.trim();
   const clientName = document.getElementById('clientName').value.trim();
+  const clientPhone = document.getElementById('clientPhone')?.value.trim() || '';
+  const privacyConsent = document.getElementById('privacyConsent')?.checked || false;
   const submitBtn = document.getElementById('submitBtn');
   const btnText = document.getElementById('btnText');
   const btnLoader = document.getElementById('btnLoader');
@@ -322,6 +324,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       body: JSON.stringify({
         code: code,
         clientName: clientName,
+        clientPhone: clientPhone,
+        privacyConsent: privacyConsent,
         deviceInfo: navigator.userAgent
       })
     });

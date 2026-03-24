@@ -24,6 +24,9 @@ function initialize() {
       code TEXT NOT NULL,
       mac_address TEXT,
       ip_address TEXT,
+      client_phone TEXT,
+      consent_given INTEGER DEFAULT 0,
+      consent_at TEXT,
       started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       expires_at DATETIME NOT NULL,
       disconnected_at DATETIME,
@@ -63,6 +66,22 @@ function initialize() {
   } catch (e) {
     // Columna ya existe, ignorar error
   }
+
+  // Migración LOPDP: agregar columnas de consentimiento y teléfono en sessions
+  try {
+    db.prepare('ALTER TABLE sessions ADD COLUMN client_phone TEXT').run();
+    console.log('✅ Columna client_phone agregada a sessions');
+  } catch (e) { /* ya existe */ }
+
+  try {
+    db.prepare('ALTER TABLE sessions ADD COLUMN consent_given INTEGER DEFAULT 0').run();
+    console.log('✅ Columna consent_given agregada a sessions');
+  } catch (e) { /* ya existe */ }
+
+  try {
+    db.prepare('ALTER TABLE sessions ADD COLUMN consent_at TEXT').run();
+    console.log('✅ Columna consent_at agregada a sessions');
+  } catch (e) { /* ya existe */ }
 }
 
 module.exports = {

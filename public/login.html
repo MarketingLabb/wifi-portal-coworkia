@@ -90,17 +90,43 @@
           </div>
 
           <div class="form-group">
-            <label for="clientName">Tu Nombre (opcional)</label>
+            <label for="clientName">Tu Nombre *</label>
             <input 
               type="text" 
               id="clientName" 
               name="clientName" 
               placeholder="Ej: María López"
+              required
               autocomplete="off"
               autocorrect="off"
               autocapitalize="words"
               spellcheck="false"
             >
+          </div>
+
+          <div class="form-group">
+            <label for="clientPhone">Tu Teléfono (opcional)</label>
+            <input 
+              type="tel" 
+              id="clientPhone" 
+              name="clientPhone" 
+              placeholder="Ej: 0991234567"
+              inputmode="numeric"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group" style="display:flex; align-items:flex-start; gap:10px; margin-top:4px;">
+            <input 
+              type="checkbox" 
+              id="privacyConsent" 
+              name="privacyConsent" 
+              required
+              style="margin-top:3px; flex-shrink:0; width:18px; height:18px; accent-color:#4ade80;"
+            >
+            <label for="privacyConsent" style="font-size:13px; color:#aaa; cursor:pointer; line-height:1.5;">
+              Acepto la <a href="https://coworkia-agent-e97d15dac56f.herokuapp.com/privacidad" target="_blank" style="color:#4ade80;">Política de Privacidad</a> de Coworkia y autorizo el tratamiento de mis datos para el acceso al servicio WiFi.
+            </label>
           </div>
 
           <button type="submit" id="submitBtn">
@@ -126,7 +152,7 @@
     <div class="footer">
       <div class="footer-brand">Coworkia</div>
       <div class="footer-tagline">work · connect · grow</div>
-      <div class="footer-info">El sistema IA de Coworkia está creado por MarketingLab / OneMind</div>
+      <div class="footer-info"><a href="https://coworkia-agent-e97d15dac56f.herokuapp.com/privacidad" target="_blank" style="color:inherit; opacity:0.7;">Política de Privacidad</a> · Coworkia Business Center</div>
     </div>
   </div>
 
