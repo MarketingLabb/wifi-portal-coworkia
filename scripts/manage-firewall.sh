@@ -12,6 +12,10 @@ write_anchor_rules() {
     cat > "$PF_ANCHOR" << 'RULES'
 table <coworkia_auth> persist
 
+# Permitir DHCP (asignacion de IP a dispositivos)
+pass in quick on bridge100 proto udp from any port 68 to any port 67
+pass out quick on bridge100 proto udp from any port 67 to any port 68
+
 pass in quick on bridge100 proto udp from any to any port 53
 pass out quick on bridge100 proto udp from any to any port 53
 
