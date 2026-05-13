@@ -1,9 +1,10 @@
 #!/bin/bash
-# Script para gestionar acceso a internet por dirección MAC
+# Script para gestionar acceso a internet por dirección IP
 
 # Archivos de configuración
 PF_ANCHOR="/etc/pf.anchors/com.coworkia.captive"
 ALLOWED_MACS_FILE="/tmp/coworkia-allowed-macs.txt"
+ALLOWED_IPS_FILE="/tmp/coworkia-allowed-ips.txt"
 DEFAULT_DB_PATH="$HOME/wifi-portal-coworkia/database/coworkia.db"
 
 normalize_mac() {
@@ -18,44 +19,59 @@ sync_from_db() {
         return 1
     fi
 
-    echo "🔄 Sincronizando MACs permitidas desde DB: $db_path"
+    echo "🔄 Sincronizando IPs permitidas desde DB: $db_path"
 
+    # Usar ip_address de la tabla sessions (macOS pf no soporta filtrado por MAC)
     sqlite3 "$db_path" "
-      SELECT DISTINCT lower(mac_address)
+      SELECT DISTINCT ip_address
       FROM sessions
-      WHERE mac_address IS NOT NULL
-        AND trim(mac_address) != ''
+      WHERE ip_address IS NOT NULL
+        AND trim(ip_address) != ''
+        AND ip_address != '192.168.2.2'
         AND disconnected_at IS NULL
         AND datetime(expires_at) > datetime('now')
-      ORDER BY lower(mac_address);
-    " > "$ALLOWED_MACS_FILE"
+      ORDER BY ip_address;
+    " > "$ALLOWED_IPS_FILE"
 
-    local mac_count
-    mac_count=$(grep -Ec '([0-9a-f]{2}:){5}[0-9a-f]{2}' "$ALLOWED_MACS_FILE" 2>/dev/null || true)
+    local ip_count
+    ip_count=$(grep -cE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' "$ALLOWED_IPS_FILE" 2>/dev/null || echo 0)
 
-    echo "✅ MACs activas en DB: $mac_count"
+    echo "✅ IPs activas en DB: $ip_count"
     regenerate_pf_rules
 }
 
-# Función para permitir acceso a una MAC
+# Función para permitir acceso a una MAC (busca IP en arp)
 allow_mac() {
     local mac=$1
-    
+
     if [ -z "$mac" ]; then
         echo "❌ Error: MAC address vacía"
         return 1
     fi
-    
+
     mac=$(normalize_mac "$mac")
 
-    # Agregar MAC a la lista si no existe
+    # Guardar MAC
     if ! grep -q "$mac" "$ALLOWED_MACS_FILE" 2>/dev/null; then
         echo "$mac" >> "$ALLOWED_MACS_FILE"
-        echo "✅ MAC $mac agregada a lista de permitidos"
+        echo "✅ MAC $mac agregada"
     else
         echo "ℹ️  MAC $mac ya estaba en la lista"
     fi
-    
+
+    # Buscar IP en arp y agregarla a la lista de IPs permitidas
+    local ip
+    ip=$(arp -a 2>/dev/null | grep -i "$mac" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+
+    if [ -n "$ip" ]; then
+        if ! grep -q "$ip" "$ALLOWED_IPS_FILE" 2>/dev/null; then
+            echo "$ip" >> "$ALLOWED_IPS_FILE"
+            echo "✅ IP $ip agregada para MAC $mac"
+        fi
+    else
+        echo "⚠️  No se encontró IP en arp para MAC $mac — se sincronizará desde DB"
+    fi
+
     # Regenerar reglas PF
     regenerate_pf_rules
 }
@@ -85,47 +101,57 @@ deny_mac() {
 # Función para regenerar las reglas del firewall
 regenerate_pf_rules() {
     echo "🔄 Regenerando reglas del firewall..."
-    
-    # Crear nuevo archivo de reglas
-    cat > "$PF_ANCHOR" << 'EOF'
-# Redirigir HTTPS a HTTP para portal cautivo
-rdr pass on bridge100 inet proto tcp from any to 192.168.2.2 port 443 -> 192.168.2.2 port 80
 
-# Permitir DNS siempre
-pass quick on bridge100 proto udp port 53
+    # Escribir reglas base con sintaxis válida para macOS pf
+    # NOTA: mac-src NO está soportado en macOS pf — se usan IPs
+    {
+        echo "# Permitir DNS siempre"
+        echo "pass in quick on bridge100 proto udp from any to any port 53"
+        echo "pass out quick on bridge100 proto udp from any to any port 53"
+        echo ""
+        echo "# Permitir acceso al portal siempre"
+        echo "pass in quick on bridge100 from any to 192.168.2.2"
+        echo "pass out quick on bridge100 from 192.168.2.2 to any"
+        echo ""
+    } > "$PF_ANCHOR"
 
-# Permitir acceso al portal siempre
-pass quick on bridge100 to 192.168.2.2
-
-EOF
-    
-    # Agregar reglas para cada MAC permitida
-    if [ -f "$ALLOWED_MACS_FILE" ]; then
-        while IFS= read -r mac; do
-            if [ -n "$mac" ]; then
-                # Permitir TODO el tráfico de MACs autenticadas
-                echo "# Permitir MAC autenticada: $mac" >> "$PF_ANCHOR"
-                echo "pass quick on bridge100 from any to any mac-src $(normalize_mac "$mac")" >> "$PF_ANCHOR"
+    # Agregar reglas para cada IP autenticada
+    if [ -f "$ALLOWED_IPS_FILE" ] && [ -s "$ALLOWED_IPS_FILE" ]; then
+        while IFS= read -r ip; do
+            if [[ "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "# IP autenticada: $ip" >> "$PF_ANCHOR"
+                echo "pass in quick on bridge100 from $ip to any" >> "$PF_ANCHOR"
+                echo "pass out quick on bridge100 from any to $ip" >> "$PF_ANCHOR"
             fi
-        done < "$ALLOWED_MACS_FILE"
+        done < "$ALLOWED_IPS_FILE"
+        echo "" >> "$PF_ANCHOR"
     fi
-    
-    # Bloquear todo lo demás
-    cat >> "$PF_ANCHOR" << 'EOF'
 
-# Bloquear todo el resto (excepto portal)
-block drop on bridge100 from any to !192.168.2.0/24
-EOF
-    
+    {
+        echo "# Bloquear todo el resto (excepto portal)"
+        echo "block drop in quick on bridge100 from any to !192.168.2.0/24"
+    } >> "$PF_ANCHOR"
+
     # Recargar reglas PF
-    pfctl -f /etc/pf.conf 2>/dev/null
-    
-    echo "✅ Reglas del firewall actualizadas"
+    if pfctl -f /etc/pf.conf 2>/dev/null; then
+        echo "✅ Reglas del firewall actualizadas"
+        return 0
+    else
+        echo "⚠️  Error recargando pf — revisa /etc/pf.anchors/com.coworkia.captive"
+        return 1
+    fi
 }
 
-# Función para listar MACs permitidas
+# Función para listar IPs/MACs permitidas
 list_allowed() {
-    echo "📋 MACs con acceso a internet:"
+    echo "📋 IPs con acceso a internet:"
+    if [ -f "$ALLOWED_IPS_FILE" ] && [ -s "$ALLOWED_IPS_FILE" ]; then
+        cat "$ALLOWED_IPS_FILE"
+    else
+        echo "  (ninguna)"
+    fi
+    echo ""
+    echo "📋 MACs registradas:"
     if [ -f "$ALLOWED_MACS_FILE" ] && [ -s "$ALLOWED_MACS_FILE" ]; then
         cat "$ALLOWED_MACS_FILE"
     else
